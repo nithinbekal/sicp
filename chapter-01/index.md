@@ -258,3 +258,15 @@ Iterative process:
           (iter 2 1 0 3)))
 
 Here, the `iter` procedure keeps track of the 3 co-efficients of f(n). Since `n` is returned directly for n<3, `c` - which keeps track of the count - starts from 3.
+
+#### Exercise 1.12
+
+To find the p-th binomial coefficient of (x + y)^n:
+
+    (define (bc p n)
+      (cond ((> p n) 0)
+            ((= p 0) 1)
+            (else (+ (bc p
+                         (- n 1))
+                     (bc (- p 1)
+                         (- n 1))))))
