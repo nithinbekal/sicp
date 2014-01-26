@@ -3,7 +3,7 @@
 
 ### Notes from lecture 1B
 
-When evaluating an exression:
+**Substitution model**
 
 * Evaluate the operator to get procedure
 * Evaluate operand to get arguments
