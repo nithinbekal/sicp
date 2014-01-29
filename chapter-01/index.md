@@ -23,8 +23,8 @@ Recursion - current state variables not enough to continue evaluation.
 
 **Fibonacci program**
 
-time complexity:  O(fib n)
-space complexity: O(n)
+- time complexity: O(fib n)
+- space complexity: O(n)
 
 Space complexity is O(n) because the space used is the length of the longest path of the recursion tree.
 
@@ -325,3 +325,96 @@ a) The value passed to `p` is reduced to 1/3rd of the value in the previous call
 So the total number of calls to `p` is 5.
 
 b) An additional step is required to compute the sine every time the angle increases by a factor of 3. The order of growth can be given as O(log n).
+
+
+#### Exercise 1.16 - Fast exponentiation
+
+    (define (exp b n)
+      (define (iter b n a)
+        (cond ((= n 0) a)
+              ((even? n) (iter (* b b)
+                               (/ n 2)
+                               a))
+              ((odd? n) (iter (* b b)
+                              (/ (- n 1) 2)
+                              (* a b)))))
+      (iter b n 1))
+
+#### Exercise 1.17 - Fast multiplication
+
+    (define (mul a b)
+      (define (double x) (* x 2))
+      (define (halve  x) (/ x 2))
+
+        (cond ((= a 0) 0)
+              ((= a 1) b)
+              ((even? a) (mul (halve a)
+                              (double b)))
+              ((odd? a) (* a
+                           (mul (halve (- a 1))
+                                (double b))))))
+
+#### Exercise 1.18 - Fast multiplication (iterative)
+
+    (define (mul a b)
+      (define (double x) (* x 2))
+      (define (halve  x) (/ x 2))
+
+      (define (iter a b c)
+        (cond ((= a 0) 0)
+              ((= a 1) b)
+              ((even? a) (iter (halve a)
+                               (double b)
+                               c))
+              ((odd? a) (iter (halve (- a 1))
+                              (double b)
+                              (* a c)))))
+      (iter a b 1))
+
+#### Exercise 1.19 - Fibonacci
+
+Applying Tpq once, we get a1, b1:
+
+    a1 = bq + aq + ap
+    b1 = bp + aq
+
+Applying Tpq on a1 and b1, we get a2 and b2:
+
+    a2 = b1 q  +  a1 q  +  a1 p
+    a2 = (bp + aq)q + (bq + aq + ap)q + (bq + aq + ap)p
+    a2 = bpq + aqq + bqq + aqq + apq + bpq + apq + app
+    a2 = 2bpq + 2aqq + bqq + aqq + 2apq + app
+    a2 = a(pp + 2pq + qq) + b(qq + 2pq)
+
+    b2 = b1 p  +  a1 q
+    b2 = (bp + aq)p + (bq + aq + ap)q
+    b2 = bpp + apq + bqq + aqq + apq
+    b2 = b(pp + qq) + a(qq + 2pq)
+
+We also know:
+
+    b2 = bp` + aq`
+
+Comparing the coefficients of a and b in the previous equation, we get p' and q'.
+
+    p` = pp + qq
+    q` = qq + 2pq
+
+Filling in the value of p' and q' in the `fib-iter` procedure:
+
+    (define (fib n)
+      (fib-iter 1 0 0 1 n))
+
+    (define (fib-iter a b p q count)
+      (cond ((= count 0) b)
+            ((even? count)
+             (fib-iter a
+                       b
+                       (+ (* p p) (* q q))    ; compute p'
+                       (+ (* q q) (* 2 p q))  ; compute q'
+                       (/ count 2)))
+            (else (fib-iter (+ (* b q) (* a q) (* a p))
+                            (+ (* b p) (* a q))
+                            p
+                            q
+                            (- count 1)))))
