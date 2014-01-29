@@ -418,3 +418,118 @@ Filling in the value of p' and q' in the `fib-iter` procedure:
                             p
                             q
                             (- count 1)))))
+
+
+#### Exercise 1.20
+
+GCD procedure:
+
+    (define (gcd aa bb)
+      (if (= bb 0)
+          aa
+          (gcd bb (remainder aa bb))))
+
+**Normal order**:
+
+    (gcd 206 40)
+
+    (if (= 40 0)
+          206
+          (gcd 40 (remainder 206 40)))
+
+    (gcd 40 (remainder 206 40))
+
+    (if (= (remainder 206 40) 0)
+          40
+          (gcd (remainder 206 40) (remainder 40 (remainder 206 40))))
+
+The predicate of the if gets evaluated here. So we now have remainder evaluated once.
+
+    (if (= 6 0)
+          40
+          (gcd (remainder 206 40) (remainder 40 (remainder 206 40))))
+
+    (gcd (remainder 206 40) (remainder 40 (remainder 206 40)))
+
+    (if (= (remainder 40 (remainder 206 40)) 0)
+          (remainder 206 40)
+          (gcd (remainder 40 (remainder 206 40)) (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))))
+
+Now the two remainders in the predicate of the if form get evaluated. 3.
+
+    (if (= (remainder 40 6) 0)
+          (remainder 206 40)
+          (gcd (remainder 40 (remainder 206 40)) (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))))    
+
+    (if (= 4 0)
+          (remainder 206 40)
+          (gcd (remainder 40 (remainder 206 40)) (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))))
+
+    (gcd (remainder 40 (remainder 206 40)) (remainder (remainder 206 40) (remainder 40 (remainder 206 40))))
+
+    (if (= (remainder (remainder 206 40) (remainder 40 (remainder 206 40))) 0)
+        (remainder 40 (remainder 206 40))
+        (gcd (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))
+             (remainder (remainder 40 (remainder 206 40))
+                        (remainder (remainder 206 40)
+                                   (remainder 40 (remainder 206 40))))))
+
+Now the 4 remainders inside the if get evaluated. 7.
+
+    (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))
+    (remainder (remainder 206 40) (remainder 40 6))
+    (remainder 6 4)
+    2
+
+Replacing 2 in the if:
+
+    (if (= 2 0)
+        (remainder 40 (remainder 206 40))
+        (gcd (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))
+             (remainder (remainder 40 (remainder 206 40))
+                        (remainder (remainder 206 40)
+                                   (remainder 40 (remainder 206 40))))))
+
+    (gcd (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))
+         (remainder (remainder 40 (remainder 206 40))
+                    (remainder (remainder 206 40)
+                               (remainder 40 (remainder 206 40)))))
+
+    (if (= b 0)
+        (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))
+        (gcd b (remainder (remainder (remainder 206 40) (remainder 40 (remainder 206 40))) b)))
+
+The expression `b` gets evaluated in the above expression. It is the same as:
+
+    (remainder  (remainder 40 (remainder 206 40))
+                (remainder  (remainder 206 40)
+                            (remainder 40 (remainder 206 40))))
+
+    (remainder  4 2)
+    0
+
+That was 7 more. Total 14. So this gets evaluated:
+
+    (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))
+
+4 more there, taking the total to 18.
+
+**In applicative order,**
+
+    (gcd 206 40)
+    (if (= 40 0) 206 (gcd 40 (remainder 206 40)))
+    (gcd 40 (remainder 206 40))
+    (gcd 40 6)
+    (if (= 6 0) 40 (gcd 6 (remainder 40 6)))
+    (gcd 6 (remainder 40 6))
+    (gcd 6 4)
+    (if (= 4 0) 6 (gcd 4 (remainder 6 4)))
+    (gcd 4 (remainder 6 4))
+    (gcd 4 2)
+    (if (= 2 0) 4 (gcd 2 (remainder 4 2)))
+    (gcd 2 (remainder 4 2))
+    (gcd 2 0)
+    (if (= 0 0) 2 (gcd 0 (remainder 2 0)))
+
+Here, the `remainder` operations are performed 4 times.
+
