@@ -552,3 +552,77 @@ Here, the `remainder` operations are performed 4 times.
     (smallest-divisor 1999)  - 1999
     (smallest-divisor 19999) - 7
 
+#### Exercise 1.22
+
+It turns out that Racket doesn't have a `runtime` primitive. To fix this, I changed the `#lang` directive to `#lang planet neil/sicp`, which installs an environment that runs all SICP programs.
+
+    (define (smallest-divisor n)
+          (find-divisor n 2))
+
+    (define (square n) (* n n))
+
+    (define (find-divisor n test-divisor)
+      (cond ((> (square test-divisor) n) n)
+            ((divides? test-divisor n) test-divisor)
+            (else (find-divisor n (+ test-divisor 1)))))
+
+    (define (divides? a b)
+      (= (remainder b a) 0))
+
+    (define (prime? n) (= (smallest-divisor n) n))
+
+    (define (timed-prime-test n)
+      (newline)
+      (display n)
+      (start-prime-test n (runtime)))
+
+    (define (start-prime-test n start-time)
+      (if (prime? n)
+          (report-prime (- (runtime) start-time))
+          #f))
+
+    (define (report-prime elapsed-time)
+      (display " *** ")
+      (display elapsed-time))
+
+Writing the `search-for-primes` procedure:
+
+    (define (search-for-primes start end)
+      (cond ((even? start) (search-for-primes (+ start 1) end))
+            ((< start end) (timed-prime-test start)(search-for-primes (+ start 2) end))))
+
+Find the three smallest primes larger than 1000; larger than 10,000; larger than 100,000:
+
+    1000           1009      1013      1019
+    1000          10007     10009     10037
+    1000         100003    100019    100043
+
+None of these take enough time for the runtime to be significant. The value is displayed as 0 every time. Trying for much larger numbers, I get:
+
+    Prime number         Runtime    Ratio of increase
+    10000000019     ***   110000    -
+    100000000003    ***   480000    4.363
+    1000000000039   ***  1290000    2.687
+    10000000000037  ***  4200000    3.255
+    100000000000031 *** 13264000    3.158
+
+Runtime increases by a factor approaching sqrt(10) (= 3.162) for every 10x increase in n.
+
+#### Exercise 1.23
+
+Rewriting `(+ test-divisor 1)` as `(next test-divisor)` using this procedure:
+
+    (define (next n)
+      (if (even? n) (+ n 1) (+ n 2)))
+
+Runtime:
+
+    Prime number         Old Runtime  New runtime   old/new
+    10000000019     ***       110000        60000   1.833
+    100000000003    ***       480000       300000   1.600
+    1000000000039   ***      1290000       730000   1.767
+    10000000000037  ***      4200000      2370000   1.772
+    100000000000031 ***     13264000      7272000   1.823
+
+The improvement is about 1.8x the previous version. This is less than the expected 2X improvement. This might be because the `(+ test-divisor 1)` has been replaced by `(next test-divisor)` which evaluates an if condition every time it is called.
+
