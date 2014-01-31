@@ -626,3 +626,44 @@ Runtime:
 
 The improvement is about 1.8x the previous version. This is less than the expected 2X improvement. This might be because the `(+ test-divisor 1)` has been replaced by `(next test-divisor)` which evaluates an if condition every time it is called.
 
+#### Exercise 1.24
+
+Using `fast-prime?`:
+
+    (define (expmod base exp m)
+      (cond ((= exp 0) 1)
+            ((even? exp)
+             (remainder (square (expmod base (/ exp 2) m))
+                        m))
+            (else
+             (remainder (* base (expmod base (- exp 1) m))
+                        m))))
+
+    (define (fermat-test n)
+      (define (try-it a)
+        (= (expmod a n n) a))
+      (try-it (+ 1 (random 4294967087))))
+
+    (define (fast-prime? n times)
+      (cond ((= times 0) true)
+            ((fermat-test n) (fast-prime? n (- times 1)))
+            (else false)))
+
+    (define (start-prime-test n start-time)
+      (if (fast-prime? n 25)
+          (report-prime (- (runtime) start-time))
+          #f))
+
+I arbitrarily set the `times` argument for `fast-prime?` as 25. Racket's `random` procedure has a limit of 4294967087. I set the random to always pick a number between 1 and 4294967087.
+
+    10000000000037         ***   70000
+    100000000000031        ***   60000
+    1000000000000037       ***   60000
+    10000000000000061      ***   90000
+    100000000000000003     ***  100000
+    1000000000000000031    ***  100000
+    10000000000000000091   ***  130000
+    100000000000000000039  ***  100000
+    1000000000000000000193 ***  130000
+
+The time increases very gradually, as might be expected from a O(log n) algorithm, but it's rather erratic. Need to test this again after figuring out how to use random numbers greater that 4294967087.
