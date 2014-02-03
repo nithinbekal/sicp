@@ -667,3 +667,113 @@ I arbitrarily set the `times` argument for `fast-prime?` as 25. Racket's `random
     1000000000000000000193 ***  130000
 
 The time increases very gradually, as might be expected from a O(log n) algorithm, but it's rather erratic. Need to test this again after figuring out how to use random numbers greater that 4294967087.
+
+#### Exercise 1.25
+
+Orginal expmod:
+
+    (define (expmod b e m)
+      (cond ((= e 0) 1)
+            ((even? e)
+                (rem (sq (expmod b (/ e 2) m)) m))
+            (else (rem (* b (expmod b (- e 1) m)) m))))
+
+Alyssa P Hacker's expmod:
+
+    (define (expmod b e m)
+      (remainder (fast-expt b e) m))
+
+    (define (fast-expt b n)
+      (cond ((= n 0) 1)
+            ((even? n) (square (fast-expt b (/ n 2))))
+            (else (* b (fast-expt b (-n 1))))))
+
+Fermat test:
+
+    (define (fermat-test n)
+      (define (try-it a) (= (expmod a n n) a))
+      (try-it (+ 1 (random (- n 1)))))
+
+After reducing `(expmod 2 13 13)` using substitution model for both cases (not gonna type in the 2 pages of scribbled notes here), it becomes apparent that in the former case, the expmod procedure never has to deal with very large numbers. At each recursive call to expmod also involves reducing that number using `remainder` before `square` is called on that result.
+
+In the latter case, the result of each recursive call to `fast-expt` is followed by either squaring or multiplication operation. The final result - `a^n` - for the values being tested in `fermat-test` is then passed to the remainder procedure. When checking for large prime numbers, the size of `a^n` can be extremely large, and therefore, inefficient.
+
+#### Exercise 1.26
+
+    (define (expmod b e m)
+      (cond ((= e 0) 1)
+            ((even? e)
+                (rem (* (expmod b (/ e 2) m)
+                        (expmod b (/ e 2) m)) m))
+            (else (rem (* b (expmod b (- e 1) m)) m))))
+
+In the original procedure, each call to the expmod procedure with exponent n calculates expmod of n/2. Due to this, we get an O(log n) process. By making the multiplication explicit, each call to expmod doubles the number of recursive calls to expmod. Thus, it reduces to an O(n) process.
+
+#### Exercise 1.27
+
+Using the `fast-prime?` procedure from exercise 1.24:
+
+    (define (square x) (* x x))
+
+    (define (expmod base exp m)
+      (cond ((= exp 0) 1)
+            ((even? exp)
+             (remainder (square (expmod base (/ exp 2) m))
+                        m))
+            (else
+             (remainder (* base (expmod base (- exp 1) m))
+                        m))))
+
+    (define (fermat-test n)
+      (define (try-it a)
+        (= (expmod a n n) a))
+      (try-it (+ 1 (random 4294967087))))
+
+    (define (fast-prime? n times)
+      (cond ((= times 0) true)
+            ((fermat-test n) (fast-prime? n (- times 1)))
+            (else false)))
+
+    (fast-prime? 561 2)
+    (fast-prime? 1105 2)
+    (fast-prime? 1769 2)
+    (fast-prime? 2465 2)
+
+The procedure returns true for these Carmichael numbers.
+
+#### Exercise 1.28
+
+Miller-Rabin test:
+
+    (define (square x) (* x x))
+
+    (define (check a n)
+      (if (and (= (remainder (square a) n) 1)
+               (not (or (= a 1)
+                        (= a (- n 1)))))
+          0
+          (remainder (square a) n)))
+
+    (define (expmod base exp m)
+      (cond ((= exp 0) 1)
+            ((even? exp)
+             (check (expmod base (/ exp 2) m) m))
+            (else
+             (remainder (* base (expmod base (- exp 1) m))
+                        m))))
+
+    (define (miller-rabin-test n)
+      (define (try-it a)
+        (= (expmod a n n) a))
+      (try-it (+ 2 (random (- n 2)))))
+
+    (define (fast-prime? n times)
+      (cond ((= times 0) true)
+            ((miller-rabin-test n) (fast-prime? n (- times 1)))
+            (else false)))
+
+    (fast-prime? 3 2)
+    (fast-prime? 4 2)
+    (fast-prime? 23 2)
+    (fast-prime? 561 2)
+    (fast-prime? 1729 2)
