@@ -777,3 +777,31 @@ Miller-Rabin test:
     (fast-prime? 23 2)
     (fast-prime? 561 2)
     (fast-prime? 1729 2)
+
+#### Exercise 1.29
+
+Simpson's method for integration:
+
+    (define (sum term a next b)
+      (if (> a b)
+          0
+          (+ (term a)
+             (sum term (next a) next b))))
+
+    (define (simpson-integral f a b n)
+      (define h (/ (- b a) n))
+      (define (next k) (+ k 1))
+
+      (define (term k)
+        (* (cond ((odd? k) 4)
+                 ((or (= k 0) (= k n)) 1)
+                 ((even? k) 2))
+           (f (+ a (* k h)))))
+
+      (* (/ h 3)
+         (sum term 0.0 next n)))
+
+    (define (cube x) (* x x x))
+
+    (simpson-integral cube 0 1 100)
+    (simpson-integral cube 0 1 1000)
