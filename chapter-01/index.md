@@ -805,3 +805,61 @@ Simpson's method for integration:
 
     (simpson-integral cube 0 1 100)
     (simpson-integral cube 0 1 1000)
+
+#### Exercise 1.30
+
+Iterative sum:
+
+    (define (sum term a next b)
+      (define (iter a result)
+        (if (= a b)
+            (+ (term a) result)
+            (iter (next a) (+ (term a) result))))
+      (iter a 0))
+
+#### Exercise 1.31
+
+Product procedure:
+
+    (define (product term a next b)
+      (define (iter a result)
+        (if (= a b)
+            (* (term a) result)
+            (iter (next a) (* (term a) result))))
+      (iter a 1))
+
+Factorial:
+
+    (define (factorial n)
+      (define (identity x) x)
+      (define (inc x) (+ x 1))
+      (product identity 2 inc n))
+
+    (factorial 5)
+
+Formula for pi:
+
+    (define (product term a next b)
+      (define (iter a result)
+        (if (= a b)
+            (* (term a) result)
+            (iter (next a) (* (term a) result))))
+      (iter a 1.0))
+
+    (define (term k)
+      (if (even? k)
+          (/ (+ k 2)
+             (+ k 3))
+          (/ (+ k 3)
+             (+ k 2))))
+
+    (define (next k) (+ k 1))
+
+    (product term 0 next 100)
+
+Recursive version:
+
+    (define (product term a next b)
+      (if (> a b)
+          1
+          (* (term a) (product term (next a) next b))))
