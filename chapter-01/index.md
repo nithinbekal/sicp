@@ -3,7 +3,7 @@
 
 #### Exercise 1.3
 
-  Define a procedure that takes three numbers as arguments and returns the sum of the squares of the two larger numbers.
+Define a procedure that takes three numbers as arguments and returns the sum of the squares of the two larger numbers.
 
     (define (sq x) (* x x))
 
@@ -849,3 +849,79 @@ Iterative version:
             (combiner null-value result)
             (iter (next a) (combiner (term a) result))))
       (iter a null-value))
+
+#### Exercise 1.33
+
+The `filtered-accumulate` procedure:
+
+    (define (filtered-accumulate combiner null-value term a next b filter?)
+      (define (iter a result)
+        (if (filter? a)
+            (if (> a b)
+                (combiner null-value result)
+                (iter (next a) (combiner (term a) result)))
+            (iter (next a) result)))
+      (iter a null-value))
+
+Using the `prime?` procedure from exercise 1.22:
+
+    (define (smallest-divisor n)
+          (find-divisor n 2))
+
+    (define (square n) (* n n))
+
+    (define (find-divisor n test-divisor)
+      (cond ((> (square test-divisor) n) n)
+            ((divides? test-divisor n) test-divisor)
+            (else (find-divisor n (+ test-divisor 1)))))
+
+    (define (divides? a b)
+      (= (remainder b a) 0))
+
+    (define (prime? n) (= (smallest-divisor n) n))
+
+Sum of squares of primes in range 2 to 10:
+
+    (define (inc x) (+ x 1))
+    (filtered-accumulate + 0 square 2 inc 10 prime?)
+
+Filtered accumulate:
+
+    (define (filtered-accumulate combiner null-value term a next b filter?)
+      (define (iter a result)
+        (if (filter? a)
+            (if (> a b)
+                (combiner null-value result)
+                (iter (next a) (combiner (term a) result)))
+            (iter (next a) result)))
+      (iter a null-value))
+
+Sum of relative primes:
+
+    (define (gcd a b)
+      (if (= b 0)
+          a
+          (gcd b (remainder a b))))
+
+    (define (inc x) (+ x 1))
+    (define (identity x) x)
+
+    (define (product-of-relative-primes-upto n)
+      (define (relatively-prime? x)
+        (= (gcd x n) 1))
+      (filtered-accumulate * 1 identity 2 inc n relatively-prime?))
+
+    (product-of-relative-primes-upto 10)
+
+#### Exercise 1.34
+
+    (define (f g)
+      (g 2))
+
+Applying substitution model to `(f f)`:
+
+    (f f)
+    (f 2)
+    (2 2)
+
+This will cause the error: `procedure application: expected procedure, given: 2; arguments were: 2`.
