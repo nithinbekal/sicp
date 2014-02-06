@@ -1,46 +1,6 @@
 
 ## Chapter 1: Buiding Abstractions With Procedures
 
-### Notes from lecture 1B
-
-**Substitution model**
-
-* Evaluate the operator to get procedure
-* Evaluate operand to get arguments
-* Apply procedure to args
-  - Copy body of procedure, substituting the args supplied for the formal params of the procedure.
-  - Evaluate the resulting new body
-
-To evaluate `if`:
-
-* Evaluate predicate first
-* if predicate yields true, evaluate conseuent
-* else evaluate alternative
-
-Iteration - all the state is in explicit variables so if the process were to be paused, we could continue evaluation using the state variables.
-
-Recursion - current state variables not enough to continue evaluation.
-
-**Fibonacci program**
-
-- time complexity: O(fib n)
-- space complexity: O(n)
-
-Space complexity is O(n) because the space used is the length of the longest path of the recursion tree.
-
-**Towers of Hanoi**
-
-Move n high tower from spike `from` to spike `to` with an extra spike `spare`.
-
-    (define (move n from to spare)
-      (cond (= n 0) 'done')
-            (else
-              (move (- n 1) from spare to)
-              (print-move from to)
-              (move (- n 1) spare to from)))
-
-    (move 3 1 3 2)
-
 #### Exercise 1.3
 
   Define a procedure that takes three numbers as arguments and returns the sum of the squares of the two larger numbers.
@@ -863,3 +823,29 @@ Recursive version:
       (if (> a b)
           1
           (* (term a) (product term (next a) next b))))
+
+
+#### Exercise 1.32
+
+Recursive version:
+
+    (define (accumulate combiner null-value term a next b)
+      (if (> a b)
+          null-value
+          (combiner (term a)
+                    (accumulate combiner null-value term (next a) next b))))
+
+    (define (inc x) (+ x 1))
+    (define (identity x) x)
+
+    (accumulate + 0 identity 1 inc 5)
+    (accumulate * 1 identity 1 inc 5)
+
+Iterative version:
+
+    (define (accumulate combiner null-value term a next b)
+      (define (iter a result)
+        (if (> a b)
+            (combiner null-value result)
+            (iter (next a) (combiner (term a) result))))
+      (iter a null-value))
