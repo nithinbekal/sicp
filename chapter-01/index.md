@@ -925,3 +925,95 @@ Applying substitution model to `(f f)`:
     (2 2)
 
 This will cause the error: `procedure application: expected procedure, given: 2; arguments were: 2`.
+
+#### Exercise 1.35
+
+Calculating the value of phi:
+
+    (define tolerance 0.0001)
+
+    (define (fixed-point f first-guess)
+      (define (close-enough? v1 v2)
+        (< (abs (- v1 v2)) tolerance))
+      (define (try guess)
+        (let ((next (f guess)))
+          (if (close-enough? guess next)
+              next
+              (try next))))
+      (try first-guess))
+
+    (define (f x)
+      (+ 1 (/ 1.0 x)))
+
+    (fixed-point f 1.0)
+
+Value: 1.6180555555555556
+
+#### Exercise 1.36
+
+    (define tolerance 0.0001)
+
+    (define (fixed-point f first-guess)
+      (define (close-enough? v1 v2)
+        (< (abs (- v1 v2)) tolerance))
+      (define (try guess)
+        (let ((next (f guess)))
+          (display guess)
+          (newline)
+          (if (close-enough? guess next)
+              next
+              (try next))))
+      (try first-guess))
+
+Without damping, it takes 28 steps.
+
+    (define (f x)
+      (/ (log 1000) (log x)))
+
+    (fixed-point f 10.0)
+
+With damping, it takes 7 steps.
+
+    (define (f x)
+      (+ (/ x 2)
+         (/ (log 1000)
+            (* 2
+               (log x)))))
+
+    (fixed-point f 10.0)
+
+#### Exercise 1.37
+
+Recursive solution:
+
+    (define (cont-frac n d k)
+      (define (calc-fraction x)
+        (if (< x k)
+            (/ (n x)
+               (+ (d x)
+                  (calc-fraction (+ x 1))))
+            (/ (n x) (d x))))
+      (calc-fraction 1))
+
+    (cont-frac (lambda (i) 1.0)
+               (lambda (i) 1.0)
+               12)
+
+The value converged after k=12.
+
+Recursive solution:
+
+    (define (cont-frac n d k)
+      (define (calc-fraction x res)
+        (display res)
+        (newline)
+        (if (= x 0)
+            res
+            (calc-fraction (- x 1) (/ (n x)
+                                      (+ (d x)
+                                         res)))))
+      (calc-fraction k (/ (n k) (d k))))
+
+    (cont-frac (lambda (i) 1.0)
+               (lambda (i) 1.0)
+               12)
