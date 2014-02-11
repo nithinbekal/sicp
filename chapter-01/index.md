@@ -1005,8 +1005,6 @@ Recursive solution:
 
     (define (cont-frac n d k)
       (define (calc-fraction x res)
-        (display res)
-        (newline)
         (if (= x 0)
             res
             (calc-fraction (- x 1) (/ (n x)
@@ -1017,3 +1015,29 @@ Recursive solution:
     (cont-frac (lambda (i) 1.0)
                (lambda (i) 1.0)
                12)
+
+#### Exercise 1.38
+
+Using the same cont-frac procedure as in 1.37, the second argument can be written as:
+
+    (define (dr x)
+      (if (= 0 (remainder (+ x 1) 3))
+          (/ (* 2 (+ x 1)) 3)
+          1))
+
+    (cont-frac (lambda (i) 1.0) dr 10)
+
+This yields the value 0.718 which is equal to (e-2).
+
+#### Exercise 1.39
+
+    (define (tan-cf x k)
+      (cont-frac (lambda (i) (if (= i 1)
+                                  x
+                                  (- (* x x))))
+                  (lambda (j) (- (* 2 j)
+                                 1))
+                  k))
+
+    (tan-cf (/ pi 3) 10)
+    => 1.732050807568877
