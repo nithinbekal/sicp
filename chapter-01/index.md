@@ -1041,3 +1041,67 @@ This yields the value 0.718 which is equal to (e-2).
 
     (tan-cf (/ pi 3) 10)
     => 1.732050807568877
+
+#### Exercise 1.41
+
+    (define (inc x)
+      (+ x 1))
+
+    (define (double f)
+      (lambda (x) (f (f x))))
+
+    (((double (double double)) inc) 5)
+
+The value returned is 21.
+
+#### Exercise 1.42
+
+    (define (inc x)
+      (+ x 1))
+
+    (define (square x) (* x x))
+
+    (define (compose f g)
+      (lambda (x) (f (g x))))
+
+    ((compose square inc) 6)
+
+#### Exercise 1.43
+
+    (define (inc x) (+ x 1))
+    (define (square x) (* x x))
+
+      (define (compose f g)
+        (lambda (x) (f (g x))))
+
+      (define (repeated f n)
+        (define (iter g i)
+          (if (= i 0)
+              g
+              (iter (compose f g) (- i 1))))
+        (iter f (- n 1)))
+
+    ((repeated square 2) 5)
+    625
+
+#### Exercise 1.44
+
+    (define (compose f g)
+      (lambda (x) (f (g x))))
+
+    (define (repeated f n)
+      (define (iter g i)
+        (if (= i 0)
+            g
+            (iter (compose f g) (- i 1))))
+      (iter f (- n 1)))
+
+    (define (smoothed f)
+      (lambda (x) (/ (+ (f x)
+                        (f (+ x 1))
+                        (f (- x 1)))
+                     3)))
+
+    (define (n-fold-smoothed f n)
+      ((repeated smoothed f n) f))
+
