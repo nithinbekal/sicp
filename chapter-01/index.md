@@ -1186,8 +1186,43 @@ Generalizing this for nth root:
     (define (nth-root x n)
        (fixed-point (repeated (average-damp (lambda (y) (/ x
                                                            (pow y (- n 1)))))
-                              n)
+                                n)
                      1.0))
 
     (nth-root 16 4)
+
+#### Exercise 1.46
+
+Defining `iterative-improve`:
+
+    (define (iterative-improve good-enough? improve)
+      (define (iter guess)
+        (if (good-enough? guess)
+            guess
+            (iter (improve guess))))
+      iter)
+
+    (define (close-enough? a b)
+      (< (abs (- a b)) 0.0001))
+
+Using it to find `sqrt`:
+
+    (define (average a b)
+      (/ (+ a b) 2))
+
+    (define (sqrt x)
+      ((iterative-improve (lambda (g) (close-enough? (* g g) x))
+                          (lambda (g) (average (/ x g) g)))
+      1.0))
+
+    (sqrt 144)
+
+Using `iterative-improve` in `fixed-point` procedure and using that in the example given in section 1.3.3:
+
+    (define (fixed-point f first-guess)
+      ((iterative-improve (lambda (g) (close-enough? (f g) g))
+                          (lambda (g) (f g)))
+       first-guess))
+
+    (fixed-point cos 1.0)
 
