@@ -1142,3 +1142,52 @@ The value returned is 21.
     (define (n-fold-smoothed f n)
       ((repeated smoothed f n) f))
 
+#### Exercise 1.45
+
+    (define tolerance 0.0001)
+
+    (define (fixed-point f first-guess)
+      (define (close-enough? v1 v2)
+        (< (abs (- v1 v2)) tolerance))
+      (define (try guess)
+        (let ((next (f guess)))
+          (if (close-enough? guess next)
+              next
+              (try next))))
+      (try first-guess))
+
+    (define (average-damp f)
+      (lambda (x) (/ (+ (f x) x)
+                     2)))
+
+    (define (compose f g)
+      (lambda (x) (f (g x))))
+
+    (define (repeated f n)
+      (define (iter g i)
+        (if (= i 0)
+            g
+            (iter (compose f g) (- i 1))))
+      (iter f (- n 1)))
+
+    (define (pow x n)
+      (if (= n 0)
+          1
+          (* (pow x (- n 1)) x)))
+
+    (define (fourth-root x)
+       (fixed-point (repeated (average-damp (lambda (y) (/ x
+                                                 (* y y y))))
+                              2)
+                     1.0))
+
+Generalizing this for nth root:
+
+    (define (nth-root x n)
+       (fixed-point (repeated (average-damp (lambda (y) (/ x
+                                                           (pow y (- n 1)))))
+                              n)
+                     1.0))
+
+    (nth-root 16 4)
+
