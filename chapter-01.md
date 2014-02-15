@@ -1,4 +1,3 @@
-
 ## Chapter 1: Buiding Abstractions With Procedures
 
 #### Exercise 1.3
