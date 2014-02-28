@@ -1,6 +1,20 @@
 ## Chapter 2: Building Abstractions With Data
 
-Pending problems: 1, 3, 5
+Pending problems: 3, 5.
+
+#### Exercise 2.1
+
+    (define (gcd a b)
+      (if (= b 0)
+          a
+          (gcd b (remainder a b))))
+
+    (define (make-rat n d)
+      (define (sign)
+        (let ((p (* n d)))
+          (if (= p (abs p)) + -)))
+      (let ((g (gcd n d)))
+        (cons ((sign) (/ n g)) (abs (/ d g)))))
 
 #### Exercise 2.2
 
