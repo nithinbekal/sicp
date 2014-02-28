@@ -1,5 +1,7 @@
 ## Chapter 2: Building Abstractions With Data
 
+Pending problems: 2.1, 3, 5
+
 #### Exercise 2.2
 
     (define (make-segment p1 p2)
@@ -42,3 +44,13 @@
     
     (define (cdr z)
       (z (lambda (p q) q)))
+
+#### Exercise 2.6
+
+    (define (one)
+      (lambda (f)
+        (lambda (x) (f x))))
+    
+    (define (two)
+      (lambda (f)
+        (lambda (x) (f (f x)))))
