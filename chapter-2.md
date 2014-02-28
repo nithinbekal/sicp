@@ -1,6 +1,6 @@
 ## Chapter 2: Building Abstractions With Data
 
-Pending problems: 2.1, 3, 5
+Pending problems: 1, 3, 5
 
 #### Exercise 2.2
 
@@ -54,3 +54,10 @@ Pending problems: 2.1, 3, 5
     (define (two)
       (lambda (f)
         (lambda (x) (f (f x)))))
+
+#### Exercise 2.7
+
+    (define (make-interval a b) (cons a b))
+    
+    (define (lower-bound int) (car int))
+    (define (upper-bound int) (cdr int))
