@@ -61,3 +61,11 @@ Pending problems: 1, 3, 5
     
     (define (lower-bound int) (car int))
     (define (upper-bound int) (cdr int))
+
+#### Exercise 2.8
+
+    (define (sub-interval x y)
+      (make-interval (- (lower-bound x)
+                        (upper-bound y))
+                     (- (upper-bound x)
+                        (lower-bound y))))
